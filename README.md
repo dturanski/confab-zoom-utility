@@ -7,6 +7,6 @@ For example, 9 participants will be allocated to 2 breakout rooms of 4 and 5, ra
 
 These constraints are currently hard coded, but can be easily tweaked. 
 
-#Running the app
+# Running the app
 Download or clone this project, and use your browser to open index.html 
 For example, in Chrome, use File -> Open (or CTRL + O) then navigate to where index.html is downloaded.
