@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Beloit Confab monthly Zoom break out assignments</title>
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+    <link rel="stylesheet" href="jquery-ui-1.13.2.custom/jquery-ui.css" />
+    <style>
+        #confab,
+        #participants {
+            border: 2px solid #eee;
+            width: 200px;
+            min-height: 100px;
+            max-height: 300px;
+            list-style-type: none;
+            overflow: auto;
+            margin: 0;
+            padding: 1px 0 0 0;
+            float: left;
+            margin-right: 10px;
+            background-color: #53a4c4;
+        }
+
+        #confab li,
+        #participants li {
+            margin: 0 5px 5px 5px;
+            padding: 0px;
+            font-size: 1.2em;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        tr {
+            background-color: #D6EEEE;
+            font-weight: bold;
+            font-family: Arial, Helvetica, sans-serif
+        }
+        th {
+            background-color: #53a4c4;
+        }
+    </style>
+    <script type="text/javascript" src="jquery-3.6.1.min.js"></script>
+    <script type="text/javascript" src="rotate.js"></script>
+    <script type="text/javascript" src="jquery-ui.min.js"></script>
+    <script>
+
+        function show_dialog(message, title, background_color) {
+            $("#dialogText").text(message);
+            $("#dialog").dialog({ title: title }).prev(".ui-dialog-titlebar").css("background", background_color);
+            $("#dialog").dialog("open");
+        }
+
+        function error_dialog(message) {
+            show_dialog(message, "Whoops!", "#ffcc00");
+        }
+
+        $(function () {
+            $("#confab, #participants").sortable({
+                connectWith: ".connectedSortable"
+            }).disableSelection();
+        });
+
+
+
+        $(document).ready(function () {
+
+            $(function () {
+                $("#dialog").dialog();
+                $('#dialog').dialog("close");
+            })
+
+
+            $.each(confab, function (val, text) {
+                $('#confab').append($('<li></li>').val(val).html(text))
+            });
+            $("#assign").on("click", function (event) {
+                let participants = []
+                $('#participants li').each(function (i, li) {
+                    participants.push(li.textContent);
+                });
+                if (participants.length == 0) {
+                    error_dialog("no participants selected");
+                }
+                else if (participants.length < min_breakout_size) {
+                    error_dialog("Too few participants for breakout sessions (at least " + min_breakout_size + " required)");
+                }
+                else {
+                    assignments = assign(participants)
+                    sessions = Object.keys(assignments)
+                    var table = $('#assignments');
+                    table.empty()
+                    table.attr("border", "1px");
+                    table.attr("background", "yellow");
+                    for (var i = 0; i < sessions.length; i++) {
+                        table.append('<th>' + sessions[i] + '</th>');
+                        rooms = Object.keys(assignments[sessions[i]])
+                        console.log(rooms[0])
+                        for (var j = 0; j < rooms.length; j++) {
+                            table.append('<tr><td>' + rooms[j] + ': ' + assignments[sessions[i]][rooms[j]] + '</td></tr>');
+                        }
+
+
+                    }
+                }
+            })
+        })
+
+    </script>
+</head>
+
+<body>
+    <h1>
+        Beloit Confab monthly Zoom break out assignments
+    </h1>
+    <div style="width: 30%; display: table;">
+        <div style="display: table-cell">
+            <div style="width: 600px; display: table-cell;">
+                <h3>Confab members</h3>
+                <ul id="confab" class="connectedSortable"></ul>
+            </div>
+            <div style="display: table-cell;">
+                <h3>On the call</h3>
+                <ul id="participants" class="connectedSortable"></ul>
+                <input id="assign" type="submit" value="Assign" />
+            </div>
+        </div>
+        <div id="dialog" title="Error message">
+            <div id="dialogText"></div>
+        </div>
+    </div>
+    <div style="display: table;">
+        <div style="display: table-cell">
+            <div style="width: 800px; display: table-cell;">
+                <h3>Breakout Assignments</h3>
+                <table id="assignments"></table>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
