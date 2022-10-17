@@ -1,36 +1,6 @@
 /*
  * Author: David Turanski
  */
-// All confab members
-const confab = [
-    'David Turanski',
-    'Becca Mudge',
-    'Becky Birch',
-    'Bob Lee',
-    'Court Federle',
-    'David Keehn',
-    'Hank Seifert',
-    'Indira Balkasoon',
-    'Jim Holik',
-    'Jim Oppenheim',
-    'John Butler',
-    'Paul Coen',
-    'Paul Engleman',
-    'Daniel Blank',
-    'Margaret Manos',
-    'Mark McCullough',
-    'Peter Ory',
-    'Seth Perlman',
-    'Jim Simon',
-    'Peter Strugatz',
-    'Jim Cousins',
-    'Debora Stern',
-    'Nick Clapp',
-    'Jim Ettore',
-    'Chuck Savage',
-    'Nancy Israel',
-    'Tom Pastore']
-
 // The number of rotations (e.g., rotate every 15 minutes)
 const rotations = 4
 const preferred_breakout_size = 4
@@ -61,7 +31,6 @@ Ideal breakout size = 4, require even distribution  n, n+1, or n-1 per room
 21 => (4, 4, 4, 4, 5)
 */
 function breakout_room_allocation(num) {
-    //console.log("num=" + num + " preferred=" + preferred_breakout_size + " max = " + max_breakout_size)
     let breakout_rooms = Math.floor(num / preferred_breakout_size)
     let r = num % preferred_breakout_size
     if (preferred_breakout_size - r == 1) {
@@ -71,7 +40,6 @@ function breakout_room_allocation(num) {
     while (Math.floor(num / breakout_rooms) > preferred_breakout_size) {
         breakout_rooms++
     }
-    //console.log("breakout_rooms=" + breakout_rooms + ", r=" + r)
     let allocation = new Array(breakout_rooms);
     let total = 0
 
@@ -95,8 +63,6 @@ function breakout_room_allocation(num) {
 
 function assign(participants) {
     let allocation = breakout_room_allocation(participants.length)
-    console.log("Allocation: " + allocation)
-    console.log(participants)
     let unshuffled = [...Array(participants.length).keys()]
 
     assignments = {}
@@ -116,5 +82,4 @@ function assign(participants) {
     
     return assignments
 }
-//console.log(assign(confab))
 

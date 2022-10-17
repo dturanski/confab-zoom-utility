@@ -7,7 +7,6 @@
     <title>Beloit Confab monthly Zoom break out assignments</title>
     <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
     <META HTTP-EQUIV="Expires" CONTENT="-1">
-    <link rel="stylesheet" href="jquery-ui-1.13.2.custom/jquery-ui.css" />
     <style>
         #confab,
         #participants {
@@ -32,20 +31,23 @@
             white-space: nowrap;
             cursor: pointer;
         }
+
         tr {
             background-color: #D6EEEE;
             font-weight: bold;
             font-family: Arial, Helvetica, sans-serif
         }
+
         th {
             background-color: #53a4c4;
         }
     </style>
-    <script type="text/javascript" src="jquery-3.6.1.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script type="text/javascript" src="rotate.js"></script>
-    <script type="text/javascript" src="jquery-ui.min.js"></script>
+    <script type="text/javascript" src="confab.js"></script>
     <script>
-
         function show_dialog(message, title, background_color) {
             $("#dialogText").text(message);
             $("#dialog").dialog({ title: title }).prev(".ui-dialog-titlebar").css("background", background_color);
@@ -62,8 +64,6 @@
             }).disableSelection();
         });
 
-
-
         $(document).ready(function () {
 
             $(function () {
@@ -75,6 +75,7 @@
             $.each(confab, function (val, text) {
                 $('#confab').append($('<li></li>').val(val).html(text))
             });
+
             $("#assign").on("click", function (event) {
                 let participants = []
                 $('#participants li').each(function (i, li) {
@@ -93,16 +94,14 @@
                     table.empty()
                     table.attr("border", "1px");
                     table.attr("background", "yellow");
-                    for (var i = 0; i < sessions.length; i++) {
-                        table.append('<th>' + sessions[i] + '</th>');
-                        rooms = Object.keys(assignments[sessions[i]])
-                        console.log(rooms[0])
-                        for (var j = 0; j < rooms.length; j++) {
-                            table.append('<tr><td>' + rooms[j] + ': ' + assignments[sessions[i]][rooms[j]] + '</td></tr>');
-                        }
+                    $.each(sessions, function (i, session) {
+                        table.append('<th>' + session + '</th>');
+                        rooms = Object.keys(assignments[session])
+                        $.each(rooms, function (i, room) {
+                            table.append('<tr><td>' + room + ': ' + assignments[session][room] + '</td></tr>')
+                        });
+                    })
 
-
-                    }
                 }
             })
         })
