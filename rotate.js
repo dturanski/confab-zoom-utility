@@ -61,14 +61,67 @@ function breakout_room_allocation(num) {
 
 }
 
-function assign(participants) {
-    let allocation = breakout_room_allocation(participants.length)
-    let unshuffled = [...Array(participants.length).keys()]
+function interactions(assignments) {
+    // How many interactions for each participant.
+    let interactions = {}
+    sessions = Object.keys(assignments)
+    for (var s in sessions) {
+        rooms = Object.keys(assignments[sessions[s]])
+        for (var r in rooms) {
+            let names = assignments[sessions[s]][rooms[r]]
+            for (var i in names ) {
+                let name = names[i]
+                if (!interactions.hasOwnProperty(name)) {
+                    interactions[name] = new Set([])
+                } 
 
+                for (other in names) {
+                    if (name !== names[other]) {
+                        interactions[name].add(names[other])
+                    }
+
+                }
+            }
+        }
+    }
+    keys = Object.keys(interactions)
+    for (k in keys) {
+        interactions[keys[k]] = Array.from( interactions[keys[k]])
+    }
+    return interactions
+}
+
+function interactions_score(interacions) {
+    let names = Object.keys(interacions)
+    let max_interactions = 0
+    let min_interactions = names.length
+    let range = 0
+    let total_interactions = 0;
+    const interactions_weight = 80.0
+    const range_weight = 20.0
+    
+    for (var i=0; i < names.length; i++) {
+        let num_interactions = interacions[names[i]].length
+        total_interactions += num_interactions
+        max_interactions = Math.max(max_interactions, num_interactions)
+        min_interactions = Math.min(min_interactions, num_interactions)
+    }
+    range = max_interactions - min_interactions
+    let score = 0
+    if (range == 0 && total_interactions == names.length * (names.length - 1)) {
+        score = Infinity
+    } else {
+       score = (interactions_weight*total_interactions)/(range_weight*(range + 1))
+    }   
+    console.log("total interactions = " + total_interactions +  " range = " + range + " max = " + max_interactions + "  min = " + min_interactions + " score = " + score)
+    return score
+}
+
+function assign_random(participants, allocation) {
     assignments = {}
     for (let r = 0; r < rotations; r++) {
         rotation = {}
-        let shuffled = shuffleArray(unshuffled)
+        let shuffled = shuffleArray([...Array(participants.length).keys()])
         let j = 0
         for (let i = 0; i < allocation.length; i++) {
             let breakout = shuffled.slice(j, j + allocation[i])
@@ -79,7 +132,31 @@ function assign(participants) {
         }
         assignments["Session " + (r+1)] = rotation
     }
-    
     return assignments
 }
 
+/*
+Call assign_random up to 1000 times and take the maximum score. 
+*/
+function assign(participants) {
+    let allocation = breakout_room_allocation(participants.length)
+    const best_score = Infinity
+    const ITERATIONS = 1000
+    let max_score = 0;
+    let iter = 0
+    let optimal_assigments = {}
+    while (iter < ITERATIONS && max_score < best_score ){
+        let assignments =  assign_random(participants, allocation)
+        let score = interactions_score(interactions(assignments))
+        max_score = Math.max(score, max_score)
+        if (score == max_score) {
+            console.log("max score = " + max_score)
+            optimal_assigments = assignments
+        }
+        iter++
+    }
+    console.log("iter:" + iter + " max: " + max_score + " best: " + best_score)
+    //TODO: This is onlyuseful for debugging
+    interactions_score(interactions(optimal_assigments))
+    return optimal_assigments
+}

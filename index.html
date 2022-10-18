@@ -39,7 +39,17 @@
         }
 
         th {
-            background-color: #53a4c4;
+            background-color: #509dbc;
+        }
+
+        #assign {
+            background-color: #D6EEEE;
+            border: none;
+            border-color: rgb(180, 222, 266);
+            border-radius: 30px;
+            position: relative; 
+            right:    0px;
+            bottom:   -125px;
         }
     </style>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.min.css">
@@ -71,6 +81,10 @@
                 $('#dialog').dialog("close");
             })
 
+            $('#participants').on('DOMSubtreeModified', function(){
+                $("#on_the_call").text("On the call (" + $('ul#participants li').length + ")")
+            })
+
 
             $.each(confab, function (val, text) {
                 $('#confab').append($('<li></li>').val(val).html(text))
@@ -88,20 +102,32 @@
                     error_dialog("Too few participants for breakout sessions (at least " + min_breakout_size + " required)");
                 }
                 else {
-                    assignments = assign(participants)
-                    sessions = Object.keys(assignments)
-                    var table = $('#assignments');
+                    
+                    let assignments = assign(participants)
+                    let sessions = Object.keys(assignments)
+                    let table = $('#assignments');
                     table.empty()
                     table.attr("border", "1px");
-                    table.attr("background", "yellow");
                     $.each(sessions, function (i, session) {
                         table.append('<th>' + session + '</th>');
-                        rooms = Object.keys(assignments[session])
+                        let rooms = Object.keys(assignments[session])
                         $.each(rooms, function (i, room) {
                             table.append('<tr><td>' + room + ': ' + assignments[session][room] + '</td></tr>')
                         });
                     })
-
+                    // Show interactions
+                    let inter = interactions(assignments)
+                    let names = Object.keys(inter)
+                    let interactions_table = $('#interactions');
+                    interactions_table.empty()
+                    interactions_table.attr("border", "1px");
+                    $.each(names, function (i, name) {
+                        interactions_table.append('<tr>')
+                        interactions_table.append('<td>' + name + '</td>')
+                        interactions_table.append('<td>' + inter[name] + '</td>')
+                        interactions_table.append('<td>' + inter[name].length + '</td>')
+                        interactions_table.append('</tr>')
+                    })
                 }
             })
         })
@@ -114,26 +140,33 @@
         Beloit Confab monthly Zoom break out assignments
     </h1>
     <div style="width: 30%; display: table;">
-        <div style="display: table-cell">
-            <div style="width: 600px; display: table-cell;">
+        <div style="display: table-row">
+            <div style="display: table-cell;">
                 <h3>Confab members</h3>
                 <ul id="confab" class="connectedSortable"></ul>
             </div>
             <div style="display: table-cell;">
-                <h3>On the call</h3>
+                <h3 id="on_the_call">On the call</h3>
                 <ul id="participants" class="connectedSortable"></ul>
-                <input id="assign" type="submit" value="Assign" />
+            </div>
+            <div style="display: table-cell;" >
+                <input id="assign" type="submit" value="Assign Breakouts"/>
             </div>
         </div>
+
         <div id="dialog" title="Error message">
             <div id="dialogText"></div>
         </div>
     </div>
     <div style="display: table;">
-        <div style="display: table-cell">
+        <div style="display: table-row">
             <div style="width: 800px; display: table-cell;">
                 <h3>Breakout Assignments</h3>
                 <table id="assignments"></table>
+            </div>
+            <div style="width: 800px; display: table-cell;">
+                <h3>Interactions</h3>
+                <table id="interactions"></table>
             </div>
         </div>
 
