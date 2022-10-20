@@ -80,11 +80,18 @@
                 $("#dialog").dialog();
                 $('#dialog').dialog("close");
             })
-
-            $('#participants').on('DOMSubtreeModified', function(){
-                $("#on_the_call").text("On the call (" + $('ul#participants li').length + ")")
+            let observer = new MutationObserver(  function(mutation){ 
+                let len = $('#participants li').filter(function(i){
+                    return this.textContent.length > 0
+                }).length
+                $("#on_the_call").text("On the call (" + len + ")") 
             })
-
+            observer.observe($('#participants')[0] , {
+                subtree:true, 
+                childList:true, 
+                characterData:true, 
+                attributes:true
+            });
 
             $.each(confab, function (val, text) {
                 $('#confab').append($('<li></li>').val(val).html(text))
